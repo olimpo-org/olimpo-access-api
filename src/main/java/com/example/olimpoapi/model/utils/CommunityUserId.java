@@ -5,37 +5,38 @@ import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 @Embeddable
 public class CommunityUserId implements Serializable {
 
     @Column(name = "customer_id")
-    private Long customerId;
+    private UUID customerId;
 
     @Column(name = "community_id")
-    private Long communityId;
+    private UUID communityId;
 
     public CommunityUserId() {
     }
 
-    public CommunityUserId(Long customerId, Long communityId) {
+    public CommunityUserId(UUID customerId, UUID communityId) {
         this.customerId = customerId;
         this.communityId = communityId;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
-    public Long getCommunityId() {
+    public UUID getCommunityId() {
         return communityId;
     }
 
-    public void setCommunityId(Long communityId) {
+    public void setCommunityId(UUID communityId) {
         this.communityId = communityId;
     }
     @Override

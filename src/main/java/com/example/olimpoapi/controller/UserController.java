@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +26,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/manterApi")
-    public ResponseEntity<String> manterApi() {
-        return ResponseEntity.ok().body("Hello World");
+    public ResponseEntity manterApi() {
+        return ResponseEntity.ok().build();
     }
 
     @Autowired
