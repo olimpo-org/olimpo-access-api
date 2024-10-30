@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CommunityService {
@@ -65,13 +66,13 @@ public class CommunityService {
         Optional<Community> community = communityRepository.findById(id);
         return community.isPresent();
     }
-    public CommunityUser addUserToCommunity(Long customerId, Long communityId) {
+    public CommunityUser addUserToCommunity(UUID customerId, UUID communityId) {
         CommunityUserId communityUserId = new CommunityUserId(customerId, communityId);
         CommunityUser communityUser = new CommunityUser(communityUserId);
         return communityUserRepository.save(communityUser);
     }
 
-    public CommunityUser removeUserFromCommunity(Long customerId, Long communityId) {
+    public CommunityUser removeUserFromCommunity(UUID customerId, UUID communityId) {
         CommunityUserId communityUserId = new CommunityUserId(customerId, communityId);
         CommunityUser communityUser = communityUserRepository
                 .findCommunityUserById(communityUserId);
@@ -81,44 +82,44 @@ public class CommunityService {
         communityUserRepository.delete(communityUser);
         return communityUser;
     }
-    public boolean verifyIfUserIsInCommunity(Long customerId, Long communityId) {
+    public boolean verifyIfUserIsInCommunity(UUID customerId, UUID communityId) {
         CommunityUserId communityUserId = new CommunityUserId(customerId, communityId);
         CommunityUser communityUser = communityUserRepository.findCommunityUserById(communityUserId);
         return communityUser != null;
     }
 
-    public List<User> getAllUsersByCommunityId(Long communityId) {
-        if (!verifyIfCommunityExists(communityId)) ExceptionThrower.throwNotFoundException("Community not found");
-        List<CommunityUser> communityUsers = communityUserRepository
-                .findAllByIdCommunityId(communityId);
-        if (communityUsers.isEmpty()) {
-            ExceptionThrower.throwNotFoundException("CommunityUsers not found");
-        }
-        List<User> users = new ArrayList<>();
-        for (CommunityUser communityUser : communityUsers) {
-            Optional<User> user = userRepository.findById(communityUser.getId().getCustomerId());
-            if (user.isPresent()) {
-                user.get().setPassword(null);
-                users.add(user.get());
-            }
+//    public List<User> getAllUsersByCommunityId(UUID communityId) {
+//        if (!verifyIfCommunityExists(communityId)) ExceptionThrower.throwNotFoundException("Community not found");
+//        List<CommunityUser> communityUsers = communityUserRepository
+//                .findAllByIdCommunityId(communityId);
+//        if (communityUsers.isEmpty()) {
+//            ExceptionThrower.throwNotFoundException("CommunityUsers not found");
+//        }
+//        List<User> users = new ArrayList<>();
+//        for (CommunityUser communityUser : communityUsers) {
+//            Optional<User> user = userRepository.findById(communityUser.getId().getCustomerId());
+//            if (user.isPresent()) {
+//                user.get().setPassword(null);
+//                users.add(user.get());
+//            }
+//
+//        }
+//        return users;
+//    }
 
-        }
-        return users;
-    }
-
-    public List<Community> getAllCommunitiesByUserId(Long customerId) {
-        List<CommunityUser> communityUsers = communityUserRepository
-                .findAllByIdCustomerId(customerId);
-        if (communityUsers.isEmpty()) {
-            ExceptionThrower.throwNotFoundException("CommunityUsers not found");
-        }
-        List<Community> communities = new ArrayList<>();
-        for (CommunityUser communityUser : communityUsers) {
-            Optional<Community> community = communityRepository.findById(communityUser.getId().getCommunityId());
-            community.ifPresent(communities::add);
-        }
-        return communities;
-    }
+//    public List<Community> getAllCommunitiesByUserId(UUID customerId) {
+//        List<CommunityUser> communityUsers = communityUserRepository
+//                .findAllByIdCustomerId(customerId);
+//        if (communityUsers.isEmpty()) {
+//            ExceptionThrower.throwNotFoundException("CommunityUsers not found");
+//        }
+//        List<Community> communities = new ArrayList<>();
+//        for (CommunityUser communityUser : communityUsers) {
+//            Optional<Community> community = communityRepository.findById(communityUser.getId().getCommunityId());
+//            community.ifPresent(communities::add);
+//        }
+//        return communities;
+//    }
 
     public List<Solicitation> getAllSolicitationsByCommunityId(String communityId) {
         List<Solicitation> o = solicitationRepository
@@ -132,17 +133,17 @@ public class CommunityService {
         solicitationRepository.save(solicitation);
         return solicitation;
     }
-
-    public void acceptSolicitation(Long solicitationId) {
-        Solicitation solicitation = solicitationRepository
-                .findById(solicitationId);
-        if (solicitation == null) {
-            ExceptionThrower.throwNotFoundException("Solicitation not found");
-        }
-        addUserToCommunity(Long.parseLong(
-                solicitation.getUserId()),
-                Long.parseLong(solicitation.getCommunityId())
-        );
-        solicitationRepository.deleteById(solicitation.getId());
-    }
+//
+//    public void acceptSolicitation(Long solicitationId) {
+//        Solicitation solicitation = solicitationRepository
+//                .findById(solicitationId);
+//        if (solicitation == null) {
+//            ExceptionThrower.throwNotFoundException("Solicitation not found");
+//        }
+//        addUserToCommunity(
+//                solicitation.getUserId()),
+//                solicitation.getCommunityId()
+//        );
+//        solicitationRepository.deleteById(solicitation.getId());
+//    }
 }
