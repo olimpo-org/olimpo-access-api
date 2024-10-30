@@ -2,6 +2,9 @@ package com.example.olimpoapi.model.postgresql;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
+
 @Entity
 @Table(name = "administrador")
 public class Administrator {
@@ -12,17 +15,17 @@ public class Administrator {
     private Long id;
 
     @NotNull(message = "CustomerId cannot be null")
-    @Column(name = "customer_cpf")
+    @Column(name = "customer_id")
     private String customerCpf;
 
     @NotNull(message = "CommunityId cannot be null")
     @Column(name = "community_id")
-    private Long communityId;
+    private UUID communityId;
 
     public Administrator() {
     }
 
-    public Administrator(Long id, String customerCpf, Long communityId) {
+    public Administrator(Long id, String customerCpf, UUID communityId) {
         this.id = id;
         this.customerCpf = customerCpf;
         this.communityId = communityId;
@@ -44,11 +47,11 @@ public class Administrator {
         this.customerCpf = customerCpf;
     }
 
-    public Long getCommunityId() {
+    public UUID getCommunityId() {
         return communityId;
     }
 
-    public void setCommunityId(Long communityId) {
+    public void setCommunityId(UUID communityId) {
         this.communityId = communityId;
     }
 }

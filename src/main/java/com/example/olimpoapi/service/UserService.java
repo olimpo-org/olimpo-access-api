@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -44,7 +45,7 @@ public class UserService {
         }
         return users;
     }
-    public User findById(Long id) {
+    public User findById(UUID id) {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()) {
             ExceptionThrower.throwNotFoundException("User not found");
@@ -78,7 +79,7 @@ public class UserService {
         return user.get();
     }
 
-    public boolean verifyIfUserExistsById(Long id) {
+    public boolean verifyIfUserExistsById(UUID id) {
         return userRepository.existsById(id);
     }
     public boolean verifyIfUserExistsByEmail(String email) {
@@ -88,7 +89,7 @@ public class UserService {
         return userRepository.existsByCpf(cpf);
     }
 
-    public boolean verifyIfIsAdministrator(String customerCpf, Long communityId) {
+    public boolean verifyIfIsAdministrator(String customerCpf, UUID communityId) {
         Optional<Administrator> administrator = administratorRepository.findByCustomerCpfAndCommunityId(
                 customerCpf, communityId
         );

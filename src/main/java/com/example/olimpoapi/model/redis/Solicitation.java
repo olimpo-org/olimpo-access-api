@@ -2,18 +2,20 @@ package com.example.olimpoapi.model.redis;
 
 import org.springframework.data.redis.core.RedisHash;
 
+import java.util.UUID;
+
 @RedisHash("solicitation")
 public class Solicitation {
     private Long id;
-    private String communityId;
-    private String userId;
+    private UUID communityId;
+    private UUID userId;
     private String userName;
     private String userUrlImage;
 
     public Solicitation(
             Long id,
-            String communityId,
-            String userId,
+            UUID communityId,
+            UUID userId,
             String userName,
             String userUrlImage
     ) {
@@ -32,19 +34,19 @@ public class Solicitation {
         this.id = id;
     }
 
-    public String getCommunityId() {
+    public UUID getCommunityId() {
         return communityId;
     }
 
-    public void setCommunityId(String communityId) {
+    public void setCommunityId(UUID communityId) {
         this.communityId = communityId;
     }
 
-    public String getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 

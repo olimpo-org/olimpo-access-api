@@ -18,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @Tag(name = "User", description = "Endpoints de Usuário")
@@ -87,7 +88,7 @@ public class UserController {
     @GetMapping("/getById/{id}")
     public ResponseEntity<User> getById(
             @Parameter(description = "ID do Usuário")
-            @PathVariable Long id
+            @PathVariable UUID id
     ) {
         return ResponseEntity.ok().body(
                 userService.findById(id)
@@ -102,7 +103,7 @@ public class UserController {
     @GetMapping("/exists/{id}")
     public ResponseEntity<Boolean> existsById(
             @Parameter(description = "ID do Usuário")
-            @PathVariable Long id
+            @PathVariable UUID id
     ) {
         return ResponseEntity.ok().body(
                 userService.verifyIfUserExistsById(id)
@@ -137,7 +138,7 @@ public class UserController {
             @Parameter(description = "ID do Usuário")
             @PathVariable String customerId,
             @Parameter(description = "ID da comunidade")
-            @PathVariable Long communityId
+            @PathVariable UUID communityId
             ) {
         return ResponseEntity.ok().body(
                 userService.verifyIfIsAdministrator(customerId, communityId)

@@ -16,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @Tag(name = "Community", description = "Endpoints de Comunidade")
@@ -65,7 +66,7 @@ public class CommunityController {
     @GetMapping("/getAllUsersInCommunity/{communityId}")
     public ResponseEntity<List<User>> getAllUsersInCommunity(
             @Parameter(description = "ID da Comunidade")
-            @PathVariable Long communityId
+            @PathVariable UUID communityId
     ) {
         return ResponseEntity.ok().body(
                 communityService.getAllUsersByCommunityId(communityId)
@@ -81,7 +82,7 @@ public class CommunityController {
     @GetMapping("/getAllCommunitiesByUser/{customerId}")
     public ResponseEntity<List<Community>> getAllCommunitiesByUser(
             @Parameter(description = "ID do Usuário")
-            @PathVariable Long customerId
+            @PathVariable UUID customerId
     ) {
         return ResponseEntity.ok().body(
                 communityService.getAllCommunitiesByUserId(customerId)
@@ -131,6 +132,16 @@ public class CommunityController {
         communityService.acceptSolicitation(solicitationId);
         return ResponseEntity.ok().body(
                 "Successfully accepted"
+        );
+    }
+
+    @PostMapping("/rejectSolicitation/{solicitationId}")
+    public ResponseEntity<String> rejectSolicitation(
+            @PathVariable Long solicitationId
+    ) {
+        communityService.rejectSolicitation(solicitationId);
+        return ResponseEntity.ok().body(
+                "Successfully rejected"
         );
     }
 
