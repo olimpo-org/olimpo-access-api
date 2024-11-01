@@ -23,18 +23,20 @@ public class CommunityService {
     private final CommunityRepository communityRepository;
     private final CommunityUserRepository communityUserRepository;
     private final UserRepository userRepository;
-    private final SolicitationRepository solicitationRepository;
+    private final SolicitationRepository solicitationCrudRepository;
+     private static final Long expirationTime = 259200L;
+
     @Autowired
-    private CommunityService(
+    public CommunityService(
             CommunityRepository communityRepository,
             CommunityUserRepository communityUserRepository,
             UserRepository userRepository,
-            SolicitationRepository solicitationRepository
+            SolicitationRepository solicitationCrudRepository
     ) {
         this.communityRepository = communityRepository;
         this.communityUserRepository = communityUserRepository;
         this.userRepository = userRepository;
-        this.solicitationRepository = solicitationRepository;
+        this.solicitationCrudRepository = solicitationCrudRepository;
     }
 
     public Community save(Community community) {
@@ -42,37 +44,37 @@ public class CommunityService {
     }
 
     public List<Community> getAll() {
-        try {
-            List<Community> communities = communityRepository.findAll();
-            if (communities.isEmpty()) {
-                ExceptionThrower.throwNotFoundException("Communities not found");
-            }
-            return communities;
-        }catch (Exception e) {
-            ExceptionThrower.throwBadRequestException(e.getMessage());
+        List<Community> communities = communityRepository.findAll();
+        if (communities.isEmpty()) {
+            ExceptionThrower.throwNotFoundException("Communities not found");
         }
-        return null;
+        return communities;
     }
 
     public Community findById(UUID id) {
-        Optional<Community> community = communityRepository.findById(id);
-        if(community.isEmpty()) {
-            ExceptionThrower.throwNotFoundException("Community not found");
-        }
-        return community.get();
+        return communityRepository.findById(id)
+                .orElseThrow();
     }
 
-    public boolean verifyIfCommunityExists(UUID id) {
-        Optional<Community> community = communityRepository.findById(id);
-        return community.isPresent();
+    public Community update(UUID id, Community community) {
+        Optional<Community> dbCommunity = communityRepository.findById(community.getId());
+        if(dbCommunity.isEmpty()) {
+            ExceptionThrower.throwNotFoundException("Community not found");
+        }
+        return communityRepository.save(community);
     }
-    public CommunityUser addUserToCommunity(UUID customerId, UUID communityId) {
+
+    public void deleteById(UUID id) {
+        communityRepository.deleteById(id);
+    }
+
+    public CommunityUser addUserToCommunity(UUID communityId, UUID customerId) {
         CommunityUserId communityUserId = new CommunityUserId(customerId, communityId);
         CommunityUser communityUser = new CommunityUser(communityUserId);
         return communityUserRepository.save(communityUser);
     }
 
-    public CommunityUser removeUserFromCommunity(UUID customerId, UUID communityId) {
+    public CommunityUser removeUserFromCommunity(UUID communityId, UUID customerId) {
         CommunityUserId communityUserId = new CommunityUserId(customerId, communityId);
         CommunityUser communityUser = communityUserRepository
                 .findCommunityUserById(communityUserId);
@@ -82,14 +84,22 @@ public class CommunityService {
         communityUserRepository.delete(communityUser);
         return communityUser;
     }
-    public boolean verifyIfUserIsInCommunity(UUID customerId, UUID communityId) {
-        CommunityUserId communityUserId = new CommunityUserId(customerId, communityId);
-        CommunityUser communityUser = communityUserRepository.findCommunityUserById(communityUserId);
-        return communityUser != null;
+
+    public List<Community> getAllCommunitiesByUserId(UUID userId) {
+        List<CommunityUser> communityUsers = communityUserRepository
+                .findAllByIdCustomerId(userId);
+        if (communityUsers.isEmpty()) {
+            ExceptionThrower.throwNotFoundException("CommunityUsers not found");
+        }
+        List<Community> communities = new ArrayList<>();
+        for (CommunityUser communityUser : communityUsers) {
+            Optional<Community> community = communityRepository.findById(communityUser.getId().getCommunityId());
+            community.ifPresent(communities::add);
+        }
+        return communities;
     }
 
     public List<User> getAllUsersByCommunityId(UUID communityId) {
-        if (!verifyIfCommunityExists(communityId)) ExceptionThrower.throwNotFoundException("Community not found");
         List<CommunityUser> communityUsers = communityUserRepository
                 .findAllByIdCommunityId(communityId);
         if (communityUsers.isEmpty()) {
@@ -102,57 +112,50 @@ public class CommunityService {
                 user.get().setPassword(null);
                 users.add(user.get());
             }
-
         }
         return users;
     }
 
-    public List<Community> getAllCommunitiesByUserId(UUID customerId) {
-        List<CommunityUser> communityUsers = communityUserRepository
-                .findAllByIdCustomerId(customerId);
-        if (communityUsers.isEmpty()) {
-            ExceptionThrower.throwNotFoundException("CommunityUsers not found");
+    public List<Solicitation> getAllSolicitationsByCommunityId(UUID communityId) {
+        Iterable<Solicitation> solicitations = solicitationCrudRepository.findAll();
+        List<Solicitation> solicitationList = new ArrayList<>();
+        for (Solicitation solicitation : solicitations) {
+            if (solicitation.getCommunityId().equals(communityId)) {
+                solicitationList.add(solicitation);
+            }
         }
-        List<Community> communities = new ArrayList<>();
-        for (CommunityUser communityUser : communityUsers) {
-            Optional<Community> community = communityRepository.findById(communityUser.getId().getCommunityId());
-            community.ifPresent(communities::add);
-        }
-        return communities;
-    }
-
-    public List<Solicitation> getAllSolicitationsByCommunityId(String communityId) {
-        List<Solicitation> o = solicitationRepository
-                .getAllByCommunityId(communityId);
-        if (o == null) {
+        if (solicitationList.isEmpty()) {
             ExceptionThrower.throwNotFoundException("Solicitation not found");
         }
-        return o;
+        return solicitationList;
     }
+
     public Solicitation createSolicitation(Solicitation solicitation) {
-        solicitationRepository.save(solicitation);
-        return solicitation;
+        solicitation.setId(UUID.randomUUID());
+        solicitation.setExpirationTime(expirationTime);
+        return solicitationCrudRepository.save(solicitation);
     }
 
-    public void acceptSolicitation(Long solicitationId) {
-        Solicitation solicitation = solicitationRepository
-                .findById(solicitationId);
-        if (solicitation == null) {
+    public void acceptSolicitation(UUID solicitationId) {
+        try {
+            Solicitation solicitation = solicitationCrudRepository
+                    .findById(solicitationId)
+                    .orElseThrow();
+            communityUserRepository
+                    .save(new CommunityUser(
+                            new CommunityUserId(solicitation.getUserId(), solicitation.getCommunityId())
+                    ));
+            solicitationCrudRepository.deleteById(solicitationId);
+        } catch (Exception e) {
             ExceptionThrower.throwNotFoundException("Solicitation not found");
         }
-        addUserToCommunity(
-                solicitation.getUserId(),
-                solicitation.getCommunityId()
-        );
-        solicitationRepository.deleteById(solicitation.getId());
     }
 
-    public void rejectSolicitation(Long solicitationId) {
-        Solicitation solicitation = solicitationRepository
-                .findById(solicitationId);
-        if (solicitation == null) {
+    public void rejectSolicitation(UUID solicitationId) {
+        try {
+            solicitationCrudRepository.deleteById(solicitationId);
+        } catch (Exception e) {
             ExceptionThrower.throwNotFoundException("Solicitation not found");
         }
-        solicitationRepository.deleteById(solicitation.getId());
     }
 }

@@ -10,9 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +50,7 @@ public class UserController {
                 userService.save(user)
         );
     }
+
     @Operation(summary = "Realizar Login", description = "Endpoint realiza o login de um usuário")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
@@ -68,6 +67,39 @@ public class UserController {
                 userService.login(login)
         );
     }
+
+    @Operation(summary = "Atualizar Usuário", description = "Endpoint atualiza um usuário pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    @PutMapping("/update/{id}")
+    public ResponseEntity<User> update(
+            @Parameter(description = "ID do Usuário")
+            @PathVariable("id") UUID id,
+            @Parameter(description = "JSON com os dados do usuário")
+            @RequestBody User user
+    ) {
+        return ResponseEntity.ok().body(
+                userService.update(id, user)
+        );
+    }
+
+    @Operation(summary = "Deletar Usuário", description = "Endpoint deleta um usuário pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário deletado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<User> delete(
+            @Parameter(description = "ID do Usuário")
+            @PathVariable("id") UUID id
+    ) {
+        userService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
+
     @Operation(summary = "Listar todos os Usuários", description = "Endpoint lista todos os usuários")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuários retornados com sucesso"),
@@ -144,64 +176,4 @@ public class UserController {
                 userService.verifyIfIsAdministrator(customerId, communityId)
         );
     }
-
-//    @Operation(summary = "Listar um Usuário pelo Email", description = "Endpoint lista um usuário pelo Email")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Usuário retornado com sucesso"),
-//            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
-//    })
-//    @GetMapping("/getByEmail/{email}")
-//    public ResponseEntity getByEmail(
-//            @Parameter(description = "Email do Usuário")
-//            @PathVariable String email
-//    ) {
-//        return ResponseEntity.ok().body(
-//                userService.findByEmail(email)
-//        );
-//    }
-//
-//    @Operation(summary = "Listar um Usuário pelo Cpf", description = "Endpoint lista um usuário pelo Cpf")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Usuário retornado com sucesso"),
-//            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
-//    })
-//    @GetMapping("/getByCpf/{cpf}")
-//    public ResponseEntity getByCpf(
-//            @Parameter(description = "Cpf do Usuário")
-//            @PathVariable String cpf
-//    ) {
-//        return ResponseEntity.ok().body(
-//                userService.findByCpf(cpf)
-//        );
-//    }
-
-//    @Operation(summary = "Verificar se um Usuário existe pelo Email", description = "Endpoint verifica se um Usuário existe pelo Email")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Usuário retornado com sucesso"),
-//            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
-//    })
-//    @GetMapping("/userExists/byEmail/{email}")
-//    public ResponseEntity verifyIfUserExistsByEmail(
-//            @Parameter(description = "Email do Usuário")
-//            @PathVariable String email
-//    ) {
-//        return ResponseEntity.ok().body(
-//                userService.verifyIfUserExistsByEmail(email)
-//        );
-//    }
-//
-//    @Operation(summary = "Verificar se um Usuário existe pelo Cpf", description = "Endpoint verifica se um Usuário existe pelo Cpf")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Usuário retornado com sucesso"),
-//            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
-//    })
-//    @GetMapping("/userExists/byCpf/{cpf}")
-//    public ResponseEntity verifyIfUserExistsByCpf(
-//            @Parameter(description = "Cpf do Usuário")
-//            @PathVariable String cpf
-//    ) {
-//        return ResponseEntity.ok().body(
-//                userService.verifyIfUserExistsByCpf(cpf)
-//        );
-//    }
 }
