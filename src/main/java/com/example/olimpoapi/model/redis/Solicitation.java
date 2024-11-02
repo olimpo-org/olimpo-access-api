@@ -17,6 +17,8 @@ public class Solicitation {
     @TimeToLive
     private Long expirationTime;
 
+    public Solicitation() {}
+
     public Solicitation(
             UUID id,
             UUID communityId,

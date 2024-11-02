@@ -11,6 +11,7 @@ import com.example.olimpoapi.repository.CommunityUserRepository;
 import com.example.olimpoapi.repository.SolicitationRepository;
 import com.example.olimpoapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,20 +24,22 @@ public class CommunityService {
     private final CommunityRepository communityRepository;
     private final CommunityUserRepository communityUserRepository;
     private final UserRepository userRepository;
-    private final SolicitationRepository solicitationCrudRepository;
-     private static final Long expirationTime = 259200L;
+    private final SolicitationRepository solicitationRepository;
+    private static final Long expirationTime = 259200L;
+
+    private RedisTemplate<UUID, Solicitation> redisTemplate;
 
     @Autowired
     public CommunityService(
             CommunityRepository communityRepository,
             CommunityUserRepository communityUserRepository,
             UserRepository userRepository,
-            SolicitationRepository solicitationCrudRepository
+            SolicitationRepository solicitationRepository
     ) {
         this.communityRepository = communityRepository;
         this.communityUserRepository = communityUserRepository;
         this.userRepository = userRepository;
-        this.solicitationCrudRepository = solicitationCrudRepository;
+        this.solicitationRepository = solicitationRepository;
     }
 
     public Community save(Community community) {
@@ -116,12 +119,20 @@ public class CommunityService {
         return users;
     }
 
+    public Solicitation createSolicitation(Solicitation solicitation) {
+        solicitation.setId(UUID.randomUUID());
+        solicitation.setExpirationTime(expirationTime);
+        return solicitationRepository.save(solicitation);
+    }
+
     public List<Solicitation> getAllSolicitationsByCommunityId(UUID communityId) {
-        Iterable<Solicitation> solicitations = solicitationCrudRepository.findAll();
+        List<Object> solicitations = solicitationRepository.findAll();
         List<Solicitation> solicitationList = new ArrayList<>();
-        for (Solicitation solicitation : solicitations) {
-            if (solicitation.getCommunityId().equals(communityId)) {
-                solicitationList.add(solicitation);
+        for (Object object : solicitations) {
+            if (object instanceof Solicitation solicitation) {
+                if (solicitation.getCommunityId().equals(communityId)) {
+                    solicitationList.add(solicitation);
+                }
             }
         }
         if (solicitationList.isEmpty()) {
@@ -130,30 +141,21 @@ public class CommunityService {
         return solicitationList;
     }
 
-    public Solicitation createSolicitation(Solicitation solicitation) {
-        solicitation.setId(UUID.randomUUID());
-        solicitation.setExpirationTime(expirationTime);
-        return solicitationCrudRepository.save(solicitation);
-    }
-
     public void acceptSolicitation(UUID solicitationId) {
-        try {
-            Solicitation solicitation = solicitationCrudRepository
-                    .findById(solicitationId)
-                    .orElseThrow();
-            communityUserRepository
-                    .save(new CommunityUser(
-                            new CommunityUserId(solicitation.getUserId(), solicitation.getCommunityId())
-                    ));
-            solicitationCrudRepository.deleteById(solicitationId);
-        } catch (Exception e) {
+        Solicitation solicitation = solicitationRepository.findById(solicitationId);
+        if (solicitation == null) {
             ExceptionThrower.throwNotFoundException("Solicitation not found");
+        } else {
+            communityUserRepository.save(
+                    new CommunityUser(new CommunityUserId(solicitation.getUserId(), solicitation.getCommunityId()))
+            );
+            solicitationRepository.deleteById(solicitationId);
         }
     }
 
     public void rejectSolicitation(UUID solicitationId) {
         try {
-            solicitationCrudRepository.deleteById(solicitationId);
+            solicitationRepository.deleteById(solicitationId);
         } catch (Exception e) {
             ExceptionThrower.throwNotFoundException("Solicitation not found");
         }
