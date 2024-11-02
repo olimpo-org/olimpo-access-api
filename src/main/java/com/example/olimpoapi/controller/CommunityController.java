@@ -142,13 +142,28 @@ public class CommunityController {
             @ApiResponse(responseCode = "200", description = "Solicitações retornadas com sucesso"),
             @ApiResponse(responseCode = "404", description = "Comunidade não encontrada")
     })
-    @GetMapping("/getAllSolicitations/{communityId}")
+    @GetMapping("/getAllSolicitations/byCommunity/{communityId}")
     public ResponseEntity<List<Solicitation>> getAllSolicitations(
             @Parameter(description = "ID da Comunidade")
             @PathVariable UUID communityId
     ) {
         return ResponseEntity.ok().body(
                 communityService.getAllSolicitationsByCommunityId(communityId)
+        );
+    }
+
+    @Operation(summary = "Listar todas as Solicitações de um Usuário", description = "Endpoint lista todas as Solicitações de um Usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Solicitações retornadas com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Comunidade não encontrada")
+    })
+    @GetMapping("/getAllSolicitations/byUser/{customerId}")
+    public ResponseEntity<List<Solicitation>> getAllSolicitationsByUser(
+            @Parameter(description = "ID do Usuário")
+            @PathVariable UUID customerId
+    ) {
+        return ResponseEntity.ok().body(
+                communityService.getAllSolicitationsByUserId(customerId)
         );
     }
 

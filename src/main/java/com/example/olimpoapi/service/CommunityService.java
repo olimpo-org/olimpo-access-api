@@ -27,8 +27,6 @@ public class CommunityService {
     private final SolicitationRepository solicitationRepository;
     private static final Long expirationTime = 259200L;
 
-    private RedisTemplate<UUID, Solicitation> redisTemplate;
-
     @Autowired
     public CommunityService(
             CommunityRepository communityRepository,
@@ -132,6 +130,25 @@ public class CommunityService {
             if (object instanceof Solicitation solicitation) {
                 if (solicitation.getCommunityId().equals(communityId)) {
                     solicitationList.add(solicitation);
+                }
+            }
+        }
+        if (solicitationList.isEmpty()) {
+            ExceptionThrower.throwNotFoundException("Solicitation not found");
+        }
+        return solicitationList;
+    }
+
+    public List<Solicitation> getAllSolicitationsByUserId(UUID userId) {
+        List<Object> solicitations = solicitationRepository.findAll();
+        List<CommunityUser> communityUsers = communityUserRepository.findAllByIdCustomerId(userId);
+        List<Solicitation> solicitationList = new ArrayList<>();
+        for (Object object : solicitations) {
+            if (object instanceof Solicitation solicitation) {
+                for (CommunityUser communityUser : communityUsers) {
+                    if (solicitation.getCommunityId().equals(communityUser.getId().getCommunityId())) {
+                        solicitationList.add(solicitation);
+                    }
                 }
             }
         }
