@@ -37,6 +37,24 @@ public class UserService {
         }
         return dbUser;
     }
+
+    public User update(UUID id, User user) {
+        Optional<User> dbUser = userRepository.findById(id);
+        if(dbUser.isEmpty()) {
+            ExceptionThrower.throwNotFoundException("User not found");
+        }
+        user.setId(id);
+        return userRepository.save(user);
+    }
+
+    public void delete(UUID id) {
+        Optional<User> user = userRepository.findById(id);
+        if(user.isEmpty()) {
+            ExceptionThrower.throwNotFoundException("User not found");
+        }
+        userRepository.delete(user.get());
+    }
+
     public List<User> getAll() {
         List<User> users = userRepository.findAll();
         users.forEach(user -> user.setPassword(null));

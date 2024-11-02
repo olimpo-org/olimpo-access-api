@@ -2,6 +2,7 @@ package com.example.olimpoapi.controller;
 
 import com.example.olimpoapi.config.exception.ExceptionThrower;
 import com.example.olimpoapi.model.postgresql.Community;
+import com.example.olimpoapi.model.postgresql.CommunityUser;
 import com.example.olimpoapi.model.postgresql.User;
 import com.example.olimpoapi.model.redis.Solicitation;
 import com.example.olimpoapi.service.CommunityService;
@@ -44,6 +45,38 @@ public class CommunityController {
         return ResponseEntity.ok().body(
                 communityService.save(community)
         );
+    }
+
+    @Operation(summary = "Atualizar uma Comunidade", description = "Endpoint atualiza uma Comunidade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Comunidade atualizada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Comunidade não encontrada")
+    })
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Community> update(
+            @Parameter(description = "ID da Comunidade")
+            @PathVariable("id") UUID id,
+            @Parameter(description = "JSON com os dados da comunidade")
+            @RequestBody Community community
+    ) {
+        community.setId(id);
+        return ResponseEntity.ok().body(
+                communityService.update(id, community)
+        );
+    }
+
+    @Operation(summary = "Deletar uma Comunidade", description = "Endpoint deleta uma Comunidade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Comunidade deletada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Comunidade não encontrada")
+    })
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Community> delete(
+            @Parameter(description = "ID da Comunidade")
+            @PathVariable("id") UUID id
+    ) {
+        communityService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Listar todas as Comunidades", description = "Endpoint lista todas as comunidades")
@@ -112,10 +145,10 @@ public class CommunityController {
     @GetMapping("/getAllSolicitations/{communityId}")
     public ResponseEntity<List<Solicitation>> getAllSolicitations(
             @Parameter(description = "ID da Comunidade")
-            @PathVariable Long communityId
+            @PathVariable UUID communityId
     ) {
         return ResponseEntity.ok().body(
-                communityService.getAllSolicitationsByCommunityId(communityId.toString())
+                communityService.getAllSolicitationsByCommunityId(communityId)
         );
     }
 
@@ -127,7 +160,7 @@ public class CommunityController {
     @PostMapping("/acceptSolicitation/{solicitationId}")
     public ResponseEntity<String> acceptSolicitation(
             @Parameter(description = "ID da Solicitação")
-            @PathVariable Long solicitationId
+            @PathVariable UUID solicitationId
     ) {
         communityService.acceptSolicitation(solicitationId);
         return ResponseEntity.ok().body(
@@ -135,9 +168,14 @@ public class CommunityController {
         );
     }
 
+    @Operation(summary = "Rejeitar uma Solicitação de uma Comunidade", description = "Endpoint rejeita uma Solicitação de uma Comunidade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Solicitação rejeitada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Comunidade não encontrada")
+    })
     @PostMapping("/rejectSolicitation/{solicitationId}")
     public ResponseEntity<String> rejectSolicitation(
-            @PathVariable Long solicitationId
+            @PathVariable UUID solicitationId
     ) {
         communityService.rejectSolicitation(solicitationId);
         return ResponseEntity.ok().body(
@@ -145,61 +183,27 @@ public class CommunityController {
         );
     }
 
-    //    @Operation(summary = "Listar uma Comunidade pelo ID", description = "Endpoint lista uma comunidade pelo ID")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Comunidade retornada com sucesso"),
-//            @ApiResponse(responseCode = "404", description = "Comunidade não encontrada")
-//    })
-//    @GetMapping("/getById/{id}")
-//    public ResponseEntity<Community> getById(@PathVariable Long id) {
-//        return ResponseEntity.ok().body(
-//                communityService.findById(id)
-//        );
-//    }
+    @Operation(summary = "Adicionar um Usuário a uma Comunidade", description = "Endpoint adiciona um Usuário a uma Comunidade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Comunidade adicionada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Comunidade ou Usuário não encontrados")
+    })
+    @PostMapping("/addUserToCommunity/{communityId}/{customerId}")
+    public ResponseEntity<CommunityUser> addUserToCommunity(@PathVariable UUID communityId, @PathVariable UUID customerId) {
+        return ResponseEntity.ok().body(
+                communityService.addUserToCommunity(communityId, customerId)
+        );
+    }
 
-//    @Operation(summary = "Adicionar um Usuário a uma Comunidade", description = "Endpoint adiciona um Usuário a uma Comunidade")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Comunidade adicionada com sucesso"),
-//            @ApiResponse(responseCode = "400", description = "Comunidade ou Usuário não encontrados")
-//    })
-//    @PostMapping("/addUserToCommunity/{communityId}/{customerId}")
-//    public ResponseEntity<CommunityUser> addUserToCommunity(@PathVariable Long communityId, @PathVariable Long customerId) {
-//        return ResponseEntity.ok().body(
-//                communityService.addUserToCommunity(customerId, communityId)
-//        );
-//    }
-//
-//    @Operation(summary = "Remover um Usuário de uma Comunidade", description = "Endpoint remove um Usuário de uma Comunidade")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Comunidade removida com sucesso"),
-//            @ApiResponse(responseCode = "400", description = "Comunidade ou Usuário não encontrados")
-//    })
-//    @DeleteMapping("/removeUserFromCommunity/{communityId}/{customerId}")
-//    public ResponseEntity<CommunityUser> removeUserFromCommunity(@PathVariable Long communityId, @PathVariable Long customerId) {
-//        return ResponseEntity.ok().body(
-//                communityService.removeUserFromCommunity(communityId, customerId)
-//        );
-//    }
-
-//    @Operation(summary = "Verificar se um Usuário está em uma Comunidade", description = "Endpoint verifica se um Usuário está em uma Comunidade")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Valor booleano retornado com sucesso"),
-//    })
-//    @GetMapping("/verifyIfUserIsInCommunity/{communityId}/{customerId}")
-//    public ResponseEntity<Boolean> verifyIfUserIsInCommunity(@PathVariable Long communityId, @PathVariable Long customerId) {
-//        return ResponseEntity.ok().body(
-//                communityService.verifyIfUserIsInCommunity(customerId, communityId)
-//        );
-//    }
-//
-//    @Operation(summary = "Verificar se uma Comunidade existe", description = "Endpoint verifica se uma Comunidade existe")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Retorno booleano com sucesso"),
-//    })
-//    @GetMapping("/verifyIfCommunityExists/{id}")
-//    public ResponseEntity<Boolean> verifyIfCommunityExists(@PathVariable Long id) {
-//        return ResponseEntity.ok().body(
-//                communityService.verifyIfCommunityExists(id)
-//        );
-//    }
+    @Operation(summary = "Remover um Usuário de uma Comunidade", description = "Endpoint remove um Usuário de uma Comunidade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Comunidade removida com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Comunidade ou Usuário não encontrados")
+    })
+    @DeleteMapping("/removeUserFromCommunity/{communityId}/{customerId}")
+    public ResponseEntity<CommunityUser> removeUserFromCommunity(@PathVariable UUID communityId, @PathVariable UUID customerId) {
+        return ResponseEntity.ok().body(
+                communityService.removeUserFromCommunity(communityId, customerId)
+        );
+    }
 }
