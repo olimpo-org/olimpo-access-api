@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @Table(name = "community")
@@ -14,7 +12,7 @@ public class Community {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private UUID id;
+    private Integer id;
 
     @NotNull(message = "Community name cannot be null")
     @Column(name = "name")
@@ -35,7 +33,7 @@ public class Community {
     public Community() {
     }
 
-    public Community(UUID id, String name, Date startDate, String neighborhood, String imageUrl) {
+    public Community(Integer id, String name, Date startDate, String neighborhood, String imageUrl) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -43,11 +41,11 @@ public class Community {
         this.imageUrl = imageUrl;
     }
 
-    public UUID getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

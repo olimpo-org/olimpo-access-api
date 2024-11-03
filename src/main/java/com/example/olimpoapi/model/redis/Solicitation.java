@@ -10,8 +10,8 @@ import java.util.UUID;
 public class Solicitation {
     @Id
     private UUID id;
-    private UUID communityId;
-    private UUID userId;
+    private Integer communityId;
+    private Integer userId;
     private String userName;
     private String userUrlImage;
     @TimeToLive
@@ -21,8 +21,8 @@ public class Solicitation {
 
     public Solicitation(
             UUID id,
-            UUID communityId,
-            UUID userId,
+            Integer communityId,
+            Integer userId,
             String userName,
             String userUrlImage,
             Long expirationTime
@@ -43,19 +43,19 @@ public class Solicitation {
         this.id = id;
     }
 
-    public UUID getCommunityId() {
+    public Integer getCommunityId() {
         return communityId;
     }
 
-    public void setCommunityId(UUID communityId) {
+    public void setCommunityId(Integer communityId) {
         this.communityId = communityId;
     }
 
-    public UUID getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(UUID userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
