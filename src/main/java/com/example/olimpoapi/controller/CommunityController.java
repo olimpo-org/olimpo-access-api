@@ -8,6 +8,7 @@ import com.example.olimpoapi.model.redis.Solicitation;
 import com.example.olimpoapi.service.CommunityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,13 +38,15 @@ public class CommunityController {
     @PostMapping("/create")
     public ResponseEntity<Community> create(
             @Parameter(description = "JSON com os dados da comunidade")
-            @RequestBody Community community, BindingResult result
+            @RequestBody Community community,
+            @RequestHeader("UserCpf") String userCpf,
+            BindingResult result
     ) {
         if (result.hasErrors()) {
             ExceptionThrower.throwBadRequestException(result.getAllErrors().get(0).getDefaultMessage());
         }
         return ResponseEntity.ok().body(
-                communityService.save(community)
+                communityService.save(community, userCpf)
         );
     }
 
@@ -55,7 +58,7 @@ public class CommunityController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Community> update(
             @Parameter(description = "ID da Comunidade")
-            @PathVariable("id") UUID id,
+            @PathVariable("id") Integer id,
             @Parameter(description = "JSON com os dados da comunidade")
             @RequestBody Community community
     ) {
@@ -73,7 +76,7 @@ public class CommunityController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Community> delete(
             @Parameter(description = "ID da Comunidade")
-            @PathVariable("id") UUID id
+            @PathVariable("id") Integer id
     ) {
         communityService.deleteById(id);
         return ResponseEntity.ok().build();
@@ -99,7 +102,7 @@ public class CommunityController {
     @GetMapping("/getAllUsersInCommunity/{communityId}")
     public ResponseEntity<List<User>> getAllUsersInCommunity(
             @Parameter(description = "ID da Comunidade")
-            @PathVariable UUID communityId
+            @PathVariable Integer communityId
     ) {
         return ResponseEntity.ok().body(
                 communityService.getAllUsersByCommunityId(communityId)
@@ -115,7 +118,7 @@ public class CommunityController {
     @GetMapping("/getAllCommunitiesByUser/{customerId}")
     public ResponseEntity<List<Community>> getAllCommunitiesByUser(
             @Parameter(description = "ID do Usuário")
-            @PathVariable UUID customerId
+            @PathVariable Integer customerId
     ) {
         return ResponseEntity.ok().body(
                 communityService.getAllCommunitiesByUserId(customerId)
@@ -145,7 +148,7 @@ public class CommunityController {
     @GetMapping("/getAllSolicitations/byCommunity/{communityId}")
     public ResponseEntity<List<Solicitation>> getAllSolicitations(
             @Parameter(description = "ID da Comunidade")
-            @PathVariable UUID communityId
+            @PathVariable Integer communityId
     ) {
         return ResponseEntity.ok().body(
                 communityService.getAllSolicitationsByCommunityId(communityId)
@@ -160,7 +163,7 @@ public class CommunityController {
     @GetMapping("/getAllSolicitations/byUser/{customerId}")
     public ResponseEntity<List<Solicitation>> getAllSolicitationsByUser(
             @Parameter(description = "ID do Usuário")
-            @PathVariable UUID customerId
+            @PathVariable Integer customerId
     ) {
         return ResponseEntity.ok().body(
                 communityService.getAllSolicitationsByUserId(customerId)
@@ -204,7 +207,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "400", description = "Comunidade ou Usuário não encontrados")
     })
     @PostMapping("/addUserToCommunity/{communityId}/{customerId}")
-    public ResponseEntity<CommunityUser> addUserToCommunity(@PathVariable UUID communityId, @PathVariable UUID customerId) {
+    public ResponseEntity<CommunityUser> addUserToCommunity(@PathVariable Integer communityId, @PathVariable Integer customerId) {
         return ResponseEntity.ok().body(
                 communityService.addUserToCommunity(communityId, customerId)
         );
@@ -216,7 +219,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "400", description = "Comunidade ou Usuário não encontrados")
     })
     @DeleteMapping("/removeUserFromCommunity/{communityId}/{customerId}")
-    public ResponseEntity<CommunityUser> removeUserFromCommunity(@PathVariable UUID communityId, @PathVariable UUID customerId) {
+    public ResponseEntity<CommunityUser> removeUserFromCommunity(@PathVariable Integer communityId, @PathVariable Integer customerId) {
         return ResponseEntity.ok().body(
                 communityService.removeUserFromCommunity(communityId, customerId)
         );

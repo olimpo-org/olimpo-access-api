@@ -11,7 +11,6 @@ import com.example.olimpoapi.repository.CommunityUserRepository;
 import com.example.olimpoapi.repository.SolicitationRepository;
 import com.example.olimpoapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,8 +39,34 @@ public class CommunityService {
         this.solicitationRepository = solicitationRepository;
     }
 
-    public Community save(Community community) {
-        return communityRepository.save(community);
+    public Community save(Community community, String userCpf) {
+        communityRepository.insertCommunity(
+                community.getName(),
+                community.getStartDate(),
+                community.getImageUrl(),
+                community.getNeighborhood(),
+                userCpf
+        );
+       List<Community> communities = communityRepository.findAll();
+       return communities.get(communities.size() - 1);
+    }
+
+    public Community update(Integer id, Community community) {
+        communityRepository.updateCommunity(
+                id,
+                community.getName(),
+                community.getStartDate(),
+                community.getImageUrl()
+        );
+        Optional<Community> updatedCommunity = communityRepository.findById(id);
+        if (updatedCommunity.isEmpty()) {
+            ExceptionThrower.throwNotFoundException("Community not found");
+        }
+        return updatedCommunity.get();
+    }
+
+    public void deleteById(Integer id) {
+        communityRepository.deleteCommunity(id);
     }
 
     public List<Community> getAll() {
@@ -52,30 +77,18 @@ public class CommunityService {
         return communities;
     }
 
-    public Community findById(UUID id) {
+    public Community findById(Integer id) {
         return communityRepository.findById(id)
                 .orElseThrow();
     }
 
-    public Community update(UUID id, Community community) {
-        Optional<Community> dbCommunity = communityRepository.findById(community.getId());
-        if(dbCommunity.isEmpty()) {
-            ExceptionThrower.throwNotFoundException("Community not found");
-        }
-        return communityRepository.save(community);
+    public CommunityUser addUserToCommunity(Integer communityId, Integer customerId) {
+        communityUserRepository.addCustomerToCommunity(customerId, communityId);
+        return communityUserRepository
+                .findCommunityUserById(new CommunityUserId(customerId, communityId));
     }
 
-    public void deleteById(UUID id) {
-        communityRepository.deleteById(id);
-    }
-
-    public CommunityUser addUserToCommunity(UUID communityId, UUID customerId) {
-        CommunityUserId communityUserId = new CommunityUserId(customerId, communityId);
-        CommunityUser communityUser = new CommunityUser(communityUserId);
-        return communityUserRepository.save(communityUser);
-    }
-
-    public CommunityUser removeUserFromCommunity(UUID communityId, UUID customerId) {
+    public CommunityUser removeUserFromCommunity(Integer communityId, Integer customerId) {
         CommunityUserId communityUserId = new CommunityUserId(customerId, communityId);
         CommunityUser communityUser = communityUserRepository
                 .findCommunityUserById(communityUserId);
@@ -86,7 +99,7 @@ public class CommunityService {
         return communityUser;
     }
 
-    public List<Community> getAllCommunitiesByUserId(UUID userId) {
+    public List<Community> getAllCommunitiesByUserId(Integer userId) {
         List<CommunityUser> communityUsers = communityUserRepository
                 .findAllByIdCustomerId(userId);
         if (communityUsers.isEmpty()) {
@@ -100,7 +113,7 @@ public class CommunityService {
         return communities;
     }
 
-    public List<User> getAllUsersByCommunityId(UUID communityId) {
+    public List<User> getAllUsersByCommunityId(Integer communityId) {
         List<CommunityUser> communityUsers = communityUserRepository
                 .findAllByIdCommunityId(communityId);
         if (communityUsers.isEmpty()) {
@@ -123,7 +136,7 @@ public class CommunityService {
         return solicitationRepository.save(solicitation);
     }
 
-    public List<Solicitation> getAllSolicitationsByCommunityId(UUID communityId) {
+    public List<Solicitation> getAllSolicitationsByCommunityId(Integer communityId) {
         List<Object> solicitations = solicitationRepository.findAll();
         List<Solicitation> solicitationList = new ArrayList<>();
         for (Object object : solicitations) {
@@ -139,7 +152,7 @@ public class CommunityService {
         return solicitationList;
     }
 
-    public List<Solicitation> getAllSolicitationsByUserId(UUID userId) {
+    public List<Solicitation> getAllSolicitationsByUserId(Integer userId) {
         List<Object> solicitations = solicitationRepository.findAll();
         List<CommunityUser> communityUsers = communityUserRepository.findAllByIdCustomerId(userId);
         List<Solicitation> solicitationList = new ArrayList<>();
@@ -163,9 +176,7 @@ public class CommunityService {
         if (solicitation == null) {
             ExceptionThrower.throwNotFoundException("Solicitation not found");
         } else {
-            communityUserRepository.save(
-                    new CommunityUser(new CommunityUserId(solicitation.getUserId(), solicitation.getCommunityId()))
-            );
+            communityUserRepository.addCustomerToCommunity(solicitation.getUserId(), solicitation.getCommunityId());
             solicitationRepository.deleteById(solicitationId);
         }
     }

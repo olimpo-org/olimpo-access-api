@@ -76,7 +76,7 @@ public class UserController {
     @PutMapping("/update/{id}")
     public ResponseEntity<User> update(
             @Parameter(description = "ID do Usuário")
-            @PathVariable("id") UUID id,
+            @PathVariable("id") Integer id,
             @Parameter(description = "JSON com os dados do usuário")
             @RequestBody User user
     ) {
@@ -93,7 +93,7 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<User> delete(
             @Parameter(description = "ID do Usuário")
-            @PathVariable("id") UUID id
+            @PathVariable("id") Integer id
     ) {
         userService.delete(id);
         return ResponseEntity.ok().build();
@@ -120,7 +120,7 @@ public class UserController {
     @GetMapping("/getById/{id}")
     public ResponseEntity<User> getById(
             @Parameter(description = "ID do Usuário")
-            @PathVariable UUID id
+            @PathVariable Integer id
     ) {
         return ResponseEntity.ok().body(
                 userService.findById(id)
@@ -135,7 +135,7 @@ public class UserController {
     @GetMapping("/exists/{id}")
     public ResponseEntity<Boolean> existsById(
             @Parameter(description = "ID do Usuário")
-            @PathVariable UUID id
+            @PathVariable Integer id
     ) {
         return ResponseEntity.ok().body(
                 userService.verifyIfUserExistsById(id)

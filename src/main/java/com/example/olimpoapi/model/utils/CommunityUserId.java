@@ -11,32 +11,32 @@ import java.util.UUID;
 public class CommunityUserId implements Serializable {
 
     @Column(name = "customer_id")
-    private UUID customerId;
+    private Integer customerId;
 
     @Column(name = "community_id")
-    private UUID communityId;
+    private Integer communityId;
 
     public CommunityUserId() {
     }
 
-    public CommunityUserId(UUID customerId, UUID communityId) {
+    public CommunityUserId(Integer customerId, Integer communityId) {
         this.customerId = customerId;
         this.communityId = communityId;
     }
 
-    public UUID getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(UUID customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 
-    public UUID getCommunityId() {
+    public Integer getCommunityId() {
         return communityId;
     }
 
-    public void setCommunityId(UUID communityId) {
+    public void setCommunityId(Integer communityId) {
         this.communityId = communityId;
     }
     @Override

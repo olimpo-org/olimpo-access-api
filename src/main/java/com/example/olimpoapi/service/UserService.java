@@ -27,7 +27,24 @@ public class UserService {
     }
 
     public User save(User user) {
-        return userRepository.save(user);
+        try {
+            if (user.getGenderId() == 1) {
+                userRepository.insertCustomer(user.getEmail(), user.getPassword(), user.getName(), user.getSurname(), user.getCpf(), "Feminino", "Tecnologia", user.getProfileImage());
+            } else if (user.getGenderId() == 2) {
+                userRepository.insertCustomer(user.getEmail(), user.getPassword(), user.getName(), user.getSurname(), user.getCpf(), "Masculino", "Tecnologia", user.getProfileImage());
+            } else {
+                userRepository.insertCustomer(user.getEmail(), user.getPassword(), user.getName(), user.getSurname(), user.getCpf(), "Outro", "Tecnologia", user.getProfileImage());
+            }
+            Optional<User> dbUser = userRepository.findByEmail(user.getEmail());
+            if (dbUser.isEmpty()) {
+                ExceptionThrower.throwNotFoundException("User not found");
+            }
+            dbUser.get().setPassword(null);
+            return dbUser.get();
+        } catch (Exception e) {
+            ExceptionThrower.throwBadRequestException(e.getMessage());
+            return null;
+        }
     }
 
     public User login(Login login){
@@ -38,21 +55,31 @@ public class UserService {
         return dbUser;
     }
 
-    public User update(UUID id, User user) {
-        Optional<User> dbUser = userRepository.findById(id);
-        if(dbUser.isEmpty()) {
-            ExceptionThrower.throwNotFoundException("User not found");
+    public User update(Integer id, User user) {
+        try {
+            if (user.getGenderId() == 1) {
+                userRepository.updateCustomer(id, user.getEmail(), user.getName(), user.getSurname(), user.getCpf(), "Feminino", user.getProfileImage());
+            } else if (user.getGenderId() == 2) {
+                userRepository.updateCustomer(id, user.getEmail(), user.getName(), user.getSurname(), user.getCpf(), "Masculino", user.getProfileImage());
+            } else {
+                userRepository.updateCustomer(id, user.getEmail(), user.getName(), user.getSurname(), user.getCpf(), "Outro", user.getProfileImage());
+            }
+            Optional<User> dbUser = userRepository.findById(id);
+            if (dbUser.isEmpty()) {
+                ExceptionThrower.throwNotFoundException("User not found");
+            } else {
+                dbUser.get().setPassword(null);
+                return dbUser.get();
+            }
+        } catch (Exception e) {
+            ExceptionThrower.throwBadRequestException(e.getMessage());
+            return null;
         }
-        user.setId(id);
-        return userRepository.save(user);
+        return null;
     }
 
-    public void delete(UUID id) {
-        Optional<User> user = userRepository.findById(id);
-        if(user.isEmpty()) {
-            ExceptionThrower.throwNotFoundException("User not found");
-        }
-        userRepository.delete(user.get());
+    public void delete(Integer id) {
+        userRepository.deleteCustomer(id);
     }
 
     public List<User> getAll() {
@@ -63,7 +90,7 @@ public class UserService {
         }
         return users;
     }
-    public User findById(UUID id) {
+    public User findById(Integer id) {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()) {
             ExceptionThrower.throwNotFoundException("User not found");
@@ -97,7 +124,7 @@ public class UserService {
         return user.get();
     }
 
-    public boolean verifyIfUserExistsById(UUID id) {
+    public boolean verifyIfUserExistsById(Integer id) {
         return userRepository.existsById(id);
     }
     public boolean verifyIfUserExistsByEmail(String email) {

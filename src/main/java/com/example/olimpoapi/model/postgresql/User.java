@@ -5,8 +5,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.UUID;
-
 @Entity
 @Table(name = "customer")
 public class User {
@@ -14,7 +12,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private UUID id;
+    private Integer id;
 
     @NotNull(message = "Email cannot be null")
     @Email(message = "Invalid email format")
@@ -50,7 +48,7 @@ public class User {
     public User() {
     }
 
-    public User(UUID id, String email, String password, String name, String surname, String cpf, String profileImage, Integer genderId) {
+    public User(Integer id, String email, String password, String name, String surname, String cpf, String profileImage, Integer genderId) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -61,11 +59,11 @@ public class User {
         this.genderId = genderId;
     }
 
-    public UUID getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
