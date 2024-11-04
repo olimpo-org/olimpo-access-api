@@ -1,15 +1,15 @@
-package com.example.olimpoapi.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Permite CORS em todas as rotas
-        .allowedOrigins("*") // Permite todas as origens
-        .allowedHeaders("*") // Permite todos cabecalhos
-        .allowedMethods("*")
-        .maxAge(3600);
+    public class WebConfig implements WebMvcConfigurer {    
+        @Override    
+        public void addCorsMappings(CorsRegistry registry) {        
+            registry.addMapping("/**") // Permite CORS para todos os endpoints               
+                .allowedOrigins("*") // Permite requisições de qualquer origem                
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Métodos permitidos                
+                .allowedHeaders("*")                
+                .allowCredentials(false); // Se true, '*' não pode ser usado em allowedOrigins    
+        }
     }
-}
