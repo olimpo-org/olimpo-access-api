@@ -39,13 +39,13 @@ public class CommunityService {
         this.solicitationRepository = solicitationRepository;
     }
 
-    public Community save(Community community, String userCpf) {
+    public Community save(Community community, Integer userId) {
         communityRepository.insertCommunity(
                 community.getName(),
                 community.getStartDate(),
                 community.getImageUrl(),
                 community.getNeighborhood(),
-                userCpf
+                userId
         );
        List<Community> communities = communityRepository.findAll();
        return communities.get(communities.size() - 1);
@@ -111,6 +111,28 @@ public class CommunityService {
             community.ifPresent(communities::add);
         }
         return communities;
+    }
+
+    public List<Community> getAllCommunitiesThatUserIsNotMember(Integer userId) {
+        try {
+            List<CommunityUser> communityUsers = communityUserRepository
+                    .findAllByIdCustomerId(userId);
+            if (communityUsers.isEmpty()) {
+                return new ArrayList<>();
+            }
+            List<Community> communityList = communityRepository.findAll();
+            if (communityList.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            for (CommunityUser communityUser : communityUsers) {
+                communityList.removeIf(community -> community.getId().equals(communityUser.getId().getCommunityId()));
+            }
+            return communityList;
+        } catch (Exception e) {
+            ExceptionThrower.throwNotFoundException("Community not found" + e.getMessage());
+        }
+        return new ArrayList<>();
     }
 
     public List<User> getAllUsersByCommunityId(Integer communityId) {

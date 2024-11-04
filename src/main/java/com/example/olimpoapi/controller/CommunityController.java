@@ -39,14 +39,14 @@ public class CommunityController {
     public ResponseEntity<Community> create(
             @Parameter(description = "JSON com os dados da comunidade")
             @RequestBody Community community,
-            @RequestHeader("UserCpf") String userCpf,
+            @RequestHeader("UserId") Integer userId,
             BindingResult result
     ) {
         if (result.hasErrors()) {
             ExceptionThrower.throwBadRequestException(result.getAllErrors().get(0).getDefaultMessage());
         }
         return ResponseEntity.ok().body(
-                communityService.save(community, userCpf)
+                communityService.save(community, userId)
         );
     }
 
@@ -122,6 +122,22 @@ public class CommunityController {
     ) {
         return ResponseEntity.ok().body(
                 communityService.getAllCommunitiesByUserId(customerId)
+        );
+    }
+
+    @Operation(summary = "Listar todas as Comunidades que o usuário não está", description = "Endpoint lista todas as Comunidades que o usuário não está")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Comunidades retornadas com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Comunidade não encontrada"),
+            @ApiResponse(responseCode = "404", description = "Nenhum Usuário encontrado na Comunidade")
+    })
+    @GetMapping("/getAllCommunitiesNotByUser/{customerId}")
+    public ResponseEntity<List<Community>> getAllCommunitiesNotByUser(
+            @Parameter(description = "ID do Usuário")
+            @PathVariable Integer customerId
+    ) {
+        return ResponseEntity.ok().body(
+                communityService.getAllCommunitiesThatUserIsNotMember(customerId)
         );
     }
 

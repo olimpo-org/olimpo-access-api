@@ -17,7 +17,7 @@ public interface CommunityRepository extends JpaRepository<Community, Integer> {
             @Param("p_date") Date date,
             @Param("p_image") String image,
             @Param("p_neighborhood") String neighborhood,
-            @Param("p_customer_cpf") String customerCpf
+            @Param("p_customer_id") Integer customerCpf
     );
 
     @Procedure(procedureName = "update_community")
