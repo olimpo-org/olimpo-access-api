@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class OlimpoapiApplication implements WebMvcConfigurer {
     public static void main(String[] args) {
