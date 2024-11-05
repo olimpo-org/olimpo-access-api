@@ -115,14 +115,14 @@ public class CommunityService {
 
     public List<Community> getAllCommunitiesThatUserIsNotMember(Integer userId) {
         try {
-            List<CommunityUser> communityUsers = communityUserRepository
-                    .findAllByIdCustomerId(userId);
-            if (communityUsers.isEmpty()) {
-                return new ArrayList<>();
-            }
             List<Community> communityList = communityRepository.findAll();
             if (communityList.isEmpty()) {
                 return new ArrayList<>();
+            }
+            List<CommunityUser> communityUsers = communityUserRepository
+                    .findAllByIdCustomerId(userId);
+            if (communityUsers.isEmpty()) {
+                return communityList;
             }
 
             for (CommunityUser communityUser : communityUsers) {
