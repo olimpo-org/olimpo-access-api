@@ -14,5 +14,5 @@ public interface CommunityUserRepository extends JpaRepository<CommunityUser, Co
     List<CommunityUser> findAllByIdCustomerId(Integer userId);
 
     @Procedure(procedureName = "add_customer_to_community")
-    void addCustomerToCommunity(@Param("p_cpf") Integer cpf, @Param("p_community_id") Integer communityId);
+    void addCustomerToCommunity(@Param("p_customer_id") Integer customerId, @Param("p_community_id") Integer communityId);
 }

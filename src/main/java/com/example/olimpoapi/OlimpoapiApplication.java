@@ -11,7 +11,8 @@ public class OlimpoapiApplication implements WebMvcConfigurer {
     public static void main(String[] args) {
         SpringApplication.run(OlimpoapiApplication.class, args);
     }
-    @Beanpublic WebMvcConfigurer corsConfigurer() {    
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {        
             @Override        
             public void addCorsMappings(CorsRegistry registry) {            

@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.query.Procedure;
 import java.sql.Date;
 
 public interface CommunityRepository extends JpaRepository<Community, Integer> {
-    @Procedure(procedureName = "delete_community")
-    void deleteCommunity(@Param("p_community_id") Integer communityId);
 
     @Procedure(procedureName = "insert_community")
     void insertCommunity(
@@ -27,4 +25,7 @@ public interface CommunityRepository extends JpaRepository<Community, Integer> {
             @Param("p_date") Date date,
             @Param("p_image") String image
     );
+
+    @Procedure(procedureName = "delete_community")
+    void deleteCommunity(@Param("p_community_id") Integer communityId);
 }
