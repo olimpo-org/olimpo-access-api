@@ -1,8 +1,8 @@
+package com.example.olimpoapi.config;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-@Configurationpublic class WebConfig implements WebMvcConfigurer {    
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
