@@ -16,9 +16,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByEmail(String email);
     boolean existsByCpf(String cpf);
 
-    @Procedure(procedureName = "delete_customer")
-    void deleteCustomer(@Param("p_customer_id") Integer customerId);
-
     @Procedure(procedureName = "insert_customer")
     void insertCustomer(
             @Param("p_email") String email,
@@ -41,4 +38,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             @Param("p_gender_name") String genderName,
             @Param("p_profile_image") String profileImage
     );
+
+    @Procedure(procedureName = "delete_customer")
+    void deleteCustomer(@Param("p_customer_id") Integer customerId);
 }
