@@ -39,7 +39,7 @@ public class AdminController {
         );
     }
 
-    @GetMapping("/verify")
+    @PostMapping("/verify")
     @Operation(summary = "Verifica se um administrador existe")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Administrador existe"),
